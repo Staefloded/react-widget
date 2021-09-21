@@ -1,15 +1,16 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
+import { Link } from "react-router-dom";
 import AuthContext from "./AuthContext";
 import UserContext from "./UserContext";
 
-// {
-//   admintest@gmail.com
-//   password
-// }
-
 export default function Dashboard() {
   const { user, logout } = useContext(AuthContext);
-  const { getAllUsersData, usersData } = useContext(UserContext);
+  const { getAllUsersData, usersData, deleteUser, message } = useContext(UserContext);
+
+  useEffect(() => {
+    user?.isAdmin && getAllUsersData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   return (
     <div>
@@ -22,23 +23,21 @@ export default function Dashboard() {
       <p>{user?.fullName}</p>
       <p>{user?.phone}</p>
       <p>{user?.age}</p>
-
-      {user.isAdmin && (
-        <div>
-          <button onClick={() => getAllUsersData()}>Get All users</button>
-
-          <button>Get a user</button>
-        </div>
-      )}
+      {message}
 
       <h3>{usersData?.message}</h3>
-      {usersData?.data?.map((item, index) => (
-        <ul>
-          <li key={index}>{item.fullName}</li>
-          <li key={index}>{item.email}</li>
-          <li key={index}>{item.phone}</li>
-        </ul>
-      ))}
+      <h3>{usersData && usersData?.data?.length}</h3>
+
+      {usersData &&
+        usersData?.data?.map((item, index) => (
+          <ul key={index}>
+            <li>{item.fullName}</li>
+            <li>{item.email}</li>
+            <li>{item.phone}</li>
+            <Link to={`/user/${item._id}`}>View More</Link>
+            <button onClick={() => deleteUser(item._id)}>Delete User</button>
+          </ul>
+        ))}
     </div>
   );
 }

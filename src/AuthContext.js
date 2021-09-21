@@ -2,8 +2,6 @@ import axios from "axios";
 import { createContext, useState, useEffect } from "react";
 import setAuthToken from "./utils/setAuthToken";
 
-const API_URL = "https://customer-care-platform.herokuapp.com";
-
 const AuthContext = createContext();
 
 export function AuthProvider(props) {
@@ -31,12 +29,13 @@ export function AuthProvider(props) {
 
     try {
       setLoading(true);
-      const res = await axios.post(`${API_URL}/users/signup`, data, config);
+      const res = await axios.post("/users/signup", data, config);
       const { user, token, message } = res.data;
+      setAuthToken(token);
       const filteredUser = handleUser(user);
-
       localStorage.setItem("userdata", JSON.stringify({ token, filteredUser }));
 
+      setUser(filteredUser);
       setIsAuthenticated(true);
 
       if (res.status === 500) {
@@ -60,9 +59,9 @@ export function AuthProvider(props) {
 
     try {
       setLoading(true);
-      const res = await axios.post(`${API_URL}/users/login`, data, config);
+      const res = await axios.post("/users/login", data, config);
       const { user, token, message } = res.data;
-
+      setAuthToken(token);
       const filteredUser = handleUser(user);
 
       localStorage.setItem("userdata", JSON.stringify({ token, filteredUser }));
